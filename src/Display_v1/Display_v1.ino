@@ -7,6 +7,7 @@
 #include <Elegoo_GFX.h>
 #include <Elegoo_TFTLCD.h>
 
+
 // These are the pins for the shield!
 #define YP A3  // must be an analog pin, use "An" notation!
 #define XM A2  // must be an analog pin, use "An" notation!
@@ -134,8 +135,8 @@ void setup() {
 int updateReady = 0;
 
 void loop() {
-  digitalWrite(13, HIGH);
   // a point object holds x y and z coordinates
+  digitalWrite(13, HIGH);
   TSPoint p = ts.getPoint();
   digitalWrite(13, LOW);
 
@@ -145,7 +146,7 @@ void loop() {
     //p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
     //p.y = (tft.height()-map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
     
-        p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
+    p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
     p.y = map(p.y, TS_MINY, TS_MAXY, tft.height(), 0);
     
     Serial.print("X = "); 
@@ -155,10 +156,11 @@ void loop() {
     //Serial.print("\tPressure = "); Serial.println(p.z);
     Serial.println(".");
 
-    if (p.x >170 & p.x < 230 & p.y > 100 & p.y < 145){
+    if (p.x >170 & p.x < 220 & p.y > 180 & p.y < 200){
       Serial.println("Top + button activated");
       frequency = frequency ++;        
       tft.setCursor(100, position2+((sectionHeight/2)-15));
+      tft.drawRect(100,position2+((sectionHeight/2)-15), 20, 20, BLACK);
       tft.println("  ");
       tft.println(frequency);
       Serial.println(frequency);
@@ -166,7 +168,7 @@ void loop() {
       delay(500);
     }
 
-    if (p.x >131 & p.x < 230 & p.y > 250 & p.y < 280){
+    if (p.x >130 & p.x < 230 & p.y > 40 & p.y < 60){
       Serial.println("Go activated");
       runCycle(frequency);
 
