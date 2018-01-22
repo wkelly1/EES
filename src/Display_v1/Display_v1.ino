@@ -37,7 +37,7 @@
 #define GREEN    0x07E0
 #define CYAN     0x07FF
 #define MAGENTA  0xF81F
-#define YELLOW   0xFFE0 
+#define YELLOW   0xFFE0
 #define WHITE    0xFFFF
 
 //pinout for relay
@@ -57,13 +57,13 @@ Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 int page = 0;
 int drawnHomeScreen = 0;
 int currentPosition = 0;
-int frequency = 1;
+int frequency = 1; //in Hz
 int time = 0;
 
 int buttonSpacing = 30;
 int numSections = 3;
-int sectionHeight = (250 - ((numSections + 1) * buttonSpacing))/numSections;
-int position1 = 70 + buttonSpacing; 
+int sectionHeight = (250 - ((numSections + 1) * buttonSpacing)) / numSections;
+int position1 = 70 + buttonSpacing;
 int position2 = position1 + sectionHeight + buttonSpacing;
 int position3 = position2 + sectionHeight + buttonSpacing;
 
@@ -75,27 +75,27 @@ void setup() {
   /*---------Finds LCD driver--------------------*/
   uint16_t identifier = tft.readID();
   Serial.println(identifier);
-  if(identifier == 0x9325) {
+  if (identifier == 0x9325) {
     Serial.println(F("Found ILI9325 LCD driver"));
-  } 
-  else if(identifier == 0x9328) {
+  }
+  else if (identifier == 0x9328) {
     Serial.println(F("Found ILI9328 LCD driver"));
-  } 
-  else if(identifier == 0x4535) {
+  }
+  else if (identifier == 0x4535) {
     Serial.println(F("Found LGDP4535 LCD driver"));
   }
-  else if(identifier == 0x7575) {
+  else if (identifier == 0x7575) {
     Serial.println(F("Found HX8347G LCD driver"));
-  } 
-  else if(identifier == 0x9341) {
+  }
+  else if (identifier == 0x9341) {
     Serial.println(F("Found ILI9341 LCD driver"));
-  } 
-  else if(identifier == 0x8357) {
+  }
+  else if (identifier == 0x8357) {
     Serial.println(F("Found HX8357D LCD driver"));
-  } 
-  else if(identifier==0x0101)
-  {     
-    identifier=0x9341;
+  }
+  else if (identifier == 0x0101)
+  {
+    identifier = 0x9341;
     Serial.println(F("Found 0x9341 LCD driver"));
   }
   else {
@@ -107,7 +107,7 @@ void setup() {
     Serial.println(F("If using the breakout board, it should NOT be #defined!"));
     Serial.println(F("Also if using the breakout, double-check that all wiring"));
     Serial.println(F("matches the tutorial."));
-    identifier=0x9341;
+    identifier = 0x9341;
 
   }
   /*---------------------------------------------*/
@@ -129,46 +129,45 @@ void setup() {
   drawHomeScreen();
 
   Serial.println(tft.width());
-  Serial.println(tft.height());  
+  Serial.println(tft.height());
 
 }
-int updateReady = 0;
+
+boolean updateReady = false;
 
 void loop() {
+
   // a point object holds x y and z coordinates
-  digitalWrite(13, HIGH);
+  
   TSPoint p = ts.getPoint();
-  digitalWrite(13, LOW);
+  
 
   // we have some minimum pressure we consider 'valid'
   // pressure of 0 means no pressing!
   if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
-    //p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
-    //p.y = (tft.height()-map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
-    
+
     p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
     p.y = map(p.y, TS_MINY, TS_MAXY, tft.height(), 0);
-    
-    Serial.print("X = "); 
+
+    Serial.print("X = ");
     Serial.print(p.x);
-    Serial.print("\tY = "); 
+    Serial.print("\tY = ");
     Serial.print(p.y);
     //Serial.print("\tPressure = "); Serial.println(p.z);
     Serial.println(".");
 
-    if (p.x >170 & p.x < 220 & p.y > 180 & p.y < 200){
+
+    if (p.x > 170 & p.x < 220 & p.y > 180 & p.y < 200) {
       Serial.println("Top + button activated");
-      frequency = frequency ++;        
-      tft.setCursor(100, position2+((sectionHeight/2)-15));
-      tft.drawRect(100,position2+((sectionHeight/2)-15), 20, 20, BLACK);
-      tft.println("  ");
-      tft.println(frequency);
-      Serial.println(frequency);
+      frequency = frequency + 1;
+      updateReady = true;
+
+
 
       delay(500);
     }
 
-    if (p.x >130 & p.x < 230 & p.y > 40 & p.y < 60){
+    if (p.x > 130 & p.x < 230 & p.y > 40 & p.y < 60) {
       Serial.println("Go activated");
       runCycle(frequency);
 
@@ -176,120 +175,137 @@ void loop() {
 
     }
   }
-  //tft.print(frequency);
+
+  Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
+  if (updateReady == true) {
+    tft.fillScreen(BLACK);
+    tft.setTextColor(RED);
+    tft.setTextSize(2);
+    tft.setCursor(10, 10);
+
+    tft.println("hello");
+    Serial.println(frequency);
+    delay(1000);
+    updateReady = false;
+  }
 }
 
-void drawHomeScreen(){
+void drawHomeScreen() {
 
   tft.fillScreen(BLACK);
   tft.setTextColor(RED);
   tft.setTextSize(2);
-  tft.setCursor(10,10);
+  tft.setCursor(10, 10);
   tft.println("Jouls Thompson");
-  tft.setCursor(10,40);
+  tft.setCursor(10, 40);
   tft.println("Cryocooler Test");
 
-  tft.setCursor(100, position2+((sectionHeight/2)-15));
-  tft.println(frequency);
 
-  tft.setTextColor(WHITE);  
-  tft.setCursor(10, position1 - buttonSpacing+10);
+
+  tft.setTextColor(WHITE);
+  tft.setCursor(10, position1 - buttonSpacing + 10);
   tft.println("Frequency");
   //defining box
-  tft.drawRect(10, position1, tft.width()-20, sectionHeight, RED); 
-  tft.fillRect(10, position1, tft.width()-20, sectionHeight, BLUE);
+  tft.drawRect(10, position1, tft.width() - 20, sectionHeight, RED);
+  tft.fillRect(10, position1, tft.width() - 20, sectionHeight, BLUE);
 
   //Buttons top
-  tft.drawRect(10, position1, 60, sectionHeight, GREEN);//Green inner box left 
+  tft.drawRect(10, position1, 60, sectionHeight, GREEN);//Green inner box left
   tft.fillRect(10, position1, 60, sectionHeight, GREEN);//Green inner box left
-  tft.drawRect(tft.width()-70, position1, 60, sectionHeight, GREEN);
-  tft.fillRect(tft.width()-70, position1, 60, sectionHeight, GREEN);
+  tft.drawRect(tft.width() - 70, position1, 60, sectionHeight, GREEN);
+  tft.fillRect(tft.width() - 70, position1, 60, sectionHeight, GREEN);
 
-  tft.setCursor(10, position2 - buttonSpacing+10);
+  tft.setCursor(10, position2 - buttonSpacing + 10);
   tft.println("Cycle Time");
-  /*
+
   //defining box
-   tft.drawRect(10, position2, tft.width()-20, sectionHeight, BLUE);
-   tft.fillRect(10, position2, tft.width()-20, sectionHeight, BLUE);
-   
-   //Buttons 2nd top
-   tft.drawRect(10, position2, 60, sectionHeight, GREEN);
-   tft.fillRect(10, position2, 60, sectionHeight, GREEN);
-   tft.drawRect(tft.width()-70, position2, 60, sectionHeight, GREEN);
-   tft.fillRect(tft.width()-70, position2, 60, sectionHeight, GREEN);
-   
-   */
+  tft.drawRect(10, position2, tft.width() - 20, sectionHeight, BLUE);
+  tft.fillRect(10, position2, tft.width() - 20, sectionHeight, BLUE);
+
+  //Buttons 2nd top
+  tft.drawRect(10, position2, 60, sectionHeight, GREEN);
+  tft.fillRect(10, position2, 60, sectionHeight, GREEN);
+  tft.drawRect(tft.width() - 70, position2, 60, sectionHeight, GREEN);
+  tft.fillRect(tft.width() - 70, position2, 60, sectionHeight, GREEN);
+
+
   //Buttons 3rd top
   tft.drawRect(10, position3, 100, sectionHeight, RED);
   tft.fillRect(10, position3, 100, sectionHeight, RED);
-  tft.drawRect(tft.width()-110, position3, 100, sectionHeight, GREEN);
-  tft.fillRect(tft.width()-110, position3, 100, sectionHeight, GREEN);
+  tft.drawRect(tft.width() - 110, position3, 100, sectionHeight, GREEN);
+  tft.fillRect(tft.width() - 110, position3, 100, sectionHeight, GREEN);
 
+  tft.setCursor((tft.width() / 2) - 10, position1 + ((sectionHeight / 2) ));
+  tft.println(frequency);
 
 
   //Button text
   tft.setTextColor(BLACK);
   tft.setTextSize(4);
-  tft.setCursor(30, position1+((sectionHeight/2)-15));
+  tft.setCursor(30, position1 + ((sectionHeight / 2) - 15));
   tft.println("-");
 
-  tft.setCursor(30, position2+((sectionHeight/2)-15));
+  tft.setCursor(30, position2 + ((sectionHeight / 2) - 15));
   tft.println("-");
 
-  tft.setCursor(190, position1+((sectionHeight/2)-15));
+  tft.setCursor(190, position1 + ((sectionHeight / 2) - 15));
   tft.println("+");
 
-  tft.setCursor(190, position2+((sectionHeight/2)-15));
+  tft.setCursor(190, position2 + ((sectionHeight / 2) - 15));
   tft.println("+");
 
 
   tft.setTextSize(2);
-  tft.setCursor(30, position3+((sectionHeight/2)-8));
+  tft.setCursor(30, position3 + ((sectionHeight / 2) - 8));
   tft.println("STOP");
 
-  tft.setCursor(170, position3+((sectionHeight/2)-8));
+  tft.setCursor(170, position3 + ((sectionHeight / 2) - 8));
   tft.println("GO");
 }
 
-void runCycle(int frequency){
-  int startTime=0;
-  int endTime=0;
-  int currentTime=0;
-  float measureStartTime = 0;
-  float measureEndTime = 0;  
+void runCycle(int frequency) {
+  int startTime = 0;
+  int endTime = 0;
+  int currentTime = 0;
+  unsigned long measureStartTime = 0;
+  unsigned long measureEndTime = 0;
   int emergancyStop = 0;
   startTime = millis();
-  endTime = startTime+5000;
+  endTime = startTime + 5000;
   Serial.print("Running Cycle");
-  while ((currentTime < endTime) || (emergancyStop = 0) ) {
-    measureStartTime = millis();
-    digitalWrite(relay1, HIGH);
-    digitalWrite(relay2, LOW);
-    digitalWrite(relay3, HIGH);
-    digitalWrite(relay4, LOW);
-    //1hz or 1 cycle a second requires 0.5 second of delay after each switch
-    delay(frequency*1000);
-    digitalWrite(relay1, LOW);
-    digitalWrite(relay2, HIGH);
-    digitalWrite(relay3, LOW);
-    digitalWrite(relay4, HIGH);
-    measureEndTime = millis();
-    delay(frequency*1000);
-    Serial.println(measureEndTime-measureStartTime);
+  while (currentTime < endTime || emergancyStop == 1 ) {
 
+    measureStartTime = millis();
+
+    //Get touch screen point
     digitalWrite(13, HIGH);
-    // a point object holds x y and z coordinates
     TSPoint p = ts.getPoint();
     digitalWrite(13, LOW);
 
     if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
       p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
-      p.y = (tft.height()-map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
+      p.y = (tft.height() - map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
 
-      if (p.x >6 & p.x < 105 & p.y > 240 & p.y < 280){
+      digitalWrite(relay1, HIGH);
+      digitalWrite(relay2, LOW);
+      digitalWrite(relay3, HIGH);
+      digitalWrite(relay4, LOW);
+      //1hz or 1 cycle a second requires 0.5 second of delay after each switch
+      delay(frequency * 1000);
+      digitalWrite(relay1, LOW);
+      digitalWrite(relay2, HIGH);
+      digitalWrite(relay3, LOW);
+      digitalWrite(relay4, HIGH);
+      measureEndTime = millis();
+      delay(frequency * 1000);
+      Serial.println(measureEndTime - measureStartTime);
+
+      if (p.x > 6 & p.x < 105 & p.y > 25 & p.y < 75) {
         emergancyStop = 1;
-        Serial.println("Emergancy Stop Activated");      
-        
+        Serial.println("Emergancy Stop Activated");
+        tft.setTextColor(RED);
+        tft.println("Emergancy Stop Activated");
+
       }
     }
     currentTime = millis();
