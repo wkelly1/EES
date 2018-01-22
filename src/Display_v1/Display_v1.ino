@@ -136,9 +136,9 @@ void setup() {
 boolean updateReady = false;
 
 void loop() {
-
+returnTFTpins();
   // a point object holds x y and z coordinates
-  
+  TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
   TSPoint p = ts.getPoint();
   
 
@@ -161,10 +161,6 @@ void loop() {
       Serial.println("Top + button activated");
       frequency = frequency + 1;
       updateReady = true;
-
-
-
-      delay(500);
     }
 
     if (p.x > 130 & p.x < 230 & p.y > 40 & p.y < 60) {
@@ -174,10 +170,13 @@ void loop() {
       delay(500);
 
     }
+    returnTFTpins();
   }
 
-  Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
+
+
   if (updateReady == true) {
+      Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
     tft.fillScreen(BLACK);
     tft.setTextColor(RED);
     tft.setTextSize(2);
@@ -188,6 +187,7 @@ void loop() {
     delay(1000);
     updateReady = false;
   }
+
 }
 
 void drawHomeScreen() {
@@ -313,6 +313,16 @@ void runCycle(int frequency) {
   }
 }
 
+void returnTFTpins() {
+   pinMode(XM, OUTPUT);
+   digitalWrite(XM, LOW);
+   pinMode(YP, OUTPUT);
+   digitalWrite(YP, HIGH);
+   pinMode(YM, OUTPUT);
+   digitalWrite(YM, LOW);
+   pinMode(XP, OUTPUT);
+   digitalWrite(XP, HIGH); 
+}
 
 
 
