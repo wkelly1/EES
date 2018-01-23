@@ -136,6 +136,8 @@ void setup() {
 }
 
 boolean updateReady = false;
+boolean frequencyUpdate = false;
+boolean cycleTimeUpdate = false;
 
 void loop() {
 
@@ -162,6 +164,7 @@ void loop() {
     if (p.x > 170 & p.x < 220 & p.y > 180 & p.y < 200) {
       Serial.println("Top + button activated");
       frequency = frequency + 1;
+     // frequencyUpdate = true;
       updateReady = true;
     }
 
@@ -171,21 +174,35 @@ void loop() {
       //cant have less that 1 frequency
       if (frequency > 1) {
         frequency = frequency - 1;
+        //frequencyUpdate = true;
+         updateReady = true;
       }
       else {
         Serial.println("Can't have a frequency less that one");
       }
-      updateReady = true;
+     
     }
 
-
+    //Plus button touch settings bottom (cycle time increase)
+    if (p.x > 170 & p.x < 230 & p.y > 100 & p.y < 160) {
+      Serial.println("Bottom + button activated");
+      //cant have less than 1 cycle time
+      if (cycleTime > 1) {
+        cycleTime = cycleTime + 1;
+       // cycleTimeUpdate = true;
+        updateReady = true;
+      }
+      else {
+        Serial.println("Can't have a cycle time less that one");
+      }
+      
+    }
 
 
     //Go Button
     if (p.x > 130 & p.x < 230 & p.y > 40 & p.y < 60) {
       Serial.println("Go activated");
       runCycle(frequency);
-
       delay(500);
 
     }
@@ -194,7 +211,7 @@ void loop() {
 
 
   //Start of screen updating
-  updateScreen();
+  updateScreen(frequencyUpdate, cycleTimeUpdate);
 
 }
 
@@ -246,6 +263,9 @@ void drawHomeScreen() {
   tft.setTextSize(3);
   tft.setCursor((tft.width() / 2) - 10, 110 );
   tft.println(frequency);
+
+  tft.setCursor((tft.width() / 2) - 20, 185);
+  tft.println(cycleTime);
 
 
   //Button text
@@ -300,13 +320,13 @@ void runCycle(int frequency) {
       digitalWrite(relay3, HIGH);
       digitalWrite(relay4, LOW);
       //1hz or 1 cycle a second requires 0.5 second of delay after each switch
-      delay(frequency * 1000);
+      delay((frequency * 1000)/2);
       digitalWrite(relay1, LOW);
       digitalWrite(relay2, HIGH);
       digitalWrite(relay3, LOW);
-      digitalWrite(relay4, HIGH);
+      digitalWrite(relay4, HIGH);    
+      delay((frequency * 1000)/2);
       measureEndTime = millis();
-      delay(frequency * 1000);
       Serial.println(measureEndTime - measureStartTime);
 
       if (p.x > 6 & p.x < 105 & p.y > 25 & p.y < 75) {
@@ -333,34 +353,53 @@ void returnTFTpins() {
   pinMode(XP, OUTPUT);
   digitalWrite(XP, HIGH);
 
-  //digitalWrite(YP, LOW);
-  //digitalWrite(YM, LOW);
-  //pinMode(XP, OUTPUT);
-  //digitalWrite(XP, LOW);
-  //pinMode(XM, OUTPUT);
-  //digitalWrite(XM, LOW);
 }
 
 
-void updateScreen() {
+void updateScreen(boolean frequencyUpdate, boolean cycleTimeUpdate) {
   if (updateReady == true) {
     tft.setTextColor(WHITE);
     tft.setTextSize(3);
-    if (frequency < 10) {
-      tft.setCursor((tft.width() / 2) - 10, 110 );
-    }
-    else {
-      tft.setCursor((tft.width() / 2) - 20, 110);
-    }
-    tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
-    tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
-    tft.println(frequency);
-    Serial.println(frequency);
-    //Slows down update
-    delay(50);
-    updateReady = false;
+    //if (frequencyUpdate == true) {
+      //Frequency update
+      if (frequency < 10) {
+        tft.setCursor((tft.width() / 2) - 10, 110 );
+      }
+      else {
+        tft.setCursor((tft.width() / 2) - 20, 110);
+      }
+      tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
+      tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
+      tft.println(frequency);
+      Serial.println(frequency);
+      
+      //Slows down update
+      delay(50);
+    //}
+    //frequencyUpdate = false;
+    //Cycle time update
+    //if (cycleTimeUpdate == true) {
+
+
+      if (cycleTime < 10) {
+        tft.setCursor((tft.width() / 2) - 10, 185 );
+      }
+      else {
+        tft.setCursor((tft.width() / 2) - 20, 185);
+      }
+      tft.drawRect(tft.width() / 2 - 40, position2 + 10, 80, 30 , BLUE);
+      tft.fillRect(tft.width() / 2 - 40, position2 + 10, 80, 30 , BLUE);
+      tft.println(cycleTime);
+      Serial.println(cycleTime);
+
+      //Slows down update
+      delay(50);
+    //}
+         // cycleTimeUpdate = false;
   }
+  updateReady = false;
 }
+
 
 
 
