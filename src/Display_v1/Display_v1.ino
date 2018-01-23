@@ -137,11 +137,11 @@ void setup() {
 boolean updateReady = false;
 
 void loop() {
-returnTFTpins();
+  //returnTFTpins();
   // a point object holds x y and z coordinates
-  TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+  //TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
   TSPoint p = ts.getPoint();
-  
+
 
   // we have some minimum pressure we consider 'valid'
   // pressure of 0 means no pressing!
@@ -177,15 +177,16 @@ returnTFTpins();
 
 
   if (updateReady == true) {
-      Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
-    tft.fillScreen(BLACK);
-    tft.setTextColor(RED);
+    //Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);     
+    //tft.fillScreen(BLACK);
+    tft.setTextColor(WHITE);
     tft.setTextSize(2);
-    tft.setCursor(10, 10);
-
-    tft.println("hello");
+    tft.setCursor((tft.width()/2)-10, 120);
+    tft.drawRect(tft.width()/2-10, 120-5, 20, 20 ,BLUE);
+    tft.fillRect(tft.width()/2-10, 120-5, 20, 20 ,BLUE);
+    tft.println(frequency);
     Serial.println(frequency);
-    delay(1000);
+    delay(100);
     updateReady = false;
   }
 
@@ -315,15 +316,24 @@ void runCycle(int frequency) {
 }
 
 void returnTFTpins() {
-   pinMode(XM, OUTPUT);
-   digitalWrite(XM, LOW);
-   pinMode(YP, OUTPUT);
-   digitalWrite(YP, HIGH);
-   pinMode(YM, OUTPUT);
-   digitalWrite(YM, LOW);
-   pinMode(XP, OUTPUT);
-   digitalWrite(XP, HIGH); 
+
+  pinMode(XM, OUTPUT);
+  digitalWrite(XM, LOW);
+  pinMode(YP, OUTPUT);
+  digitalWrite(YP, LOW);
+  pinMode(YM, OUTPUT);
+  digitalWrite(YM, LOW);
+  pinMode(XP, OUTPUT);
+  digitalWrite(XP, HIGH);
+
+  //digitalWrite(YP, LOW);
+  //digitalWrite(YM, LOW);
+  //pinMode(XP, OUTPUT);
+  //digitalWrite(XP, LOW);
+  //pinMode(XM, OUTPUT);
+  //digitalWrite(XM, LOW);
 }
+
 
 
 
