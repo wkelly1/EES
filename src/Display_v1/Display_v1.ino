@@ -315,12 +315,13 @@ void runCycle(int frequency, int cycleTime) {
     digitalWrite(relay3, HIGH);
     digitalWrite(relay4, LOW);
     //1hz or 1 cycle a second requires 0.5 second of delay after each switch
-    delay(500/(frequency * 1000));
+    delay(500/(frequency));
     digitalWrite(relay1, LOW);
     digitalWrite(relay2, HIGH);
     digitalWrite(relay3, LOW);
     digitalWrite(relay4, HIGH);
-    delay(500/(frequency * 1000));
+    delay(500/(frequency));
+    
     //Get touch screen point
     digitalWrite(13, HIGH);
     TSPoint p = ts.getPoint();
