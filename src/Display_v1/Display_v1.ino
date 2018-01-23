@@ -182,8 +182,8 @@ void loop() {
     tft.setTextColor(WHITE);
     tft.setTextSize(3);
     tft.setCursor((tft.width()/2)-20, 110);
-    tft.drawRect(tft.width()/2-20, 110-5, 30, 20 ,BLUE);
-    tft.fillRect(tft.width()/2-20, 110-5, 30, 20 ,BLUE);
+    tft.drawRect(tft.width()/2-50, 110-5, 60, 40 ,RED);
+    tft.fillRect(tft.width()/2-20, 110-5, 30, 40 ,RED);
     tft.println(frequency);
     Serial.println(frequency);
     delay(50);
@@ -237,7 +237,8 @@ void drawHomeScreen() {
   tft.drawRect(tft.width() - 110, position3, 100, sectionHeight, GREEN);
   tft.fillRect(tft.width() - 110, position3, 100, sectionHeight, GREEN);
 
-  tft.setCursor((tft.width() / 2) - 10, position1 + ((sectionHeight / 2) ));
+  tft.setTextSize(3);
+  tft.setCursor((tft.width() / 2) - 10,110 );
   tft.println(frequency);
 
 
