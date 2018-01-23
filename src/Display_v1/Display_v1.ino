@@ -2,6 +2,7 @@
 // as oversampling to avoid 'bouncing'
 // This demo code returns raw readings, public domain
 
+//including library
 #include <stdint.h>
 #include "TouchScreen.h"
 #include <Elegoo_GFX.h>
