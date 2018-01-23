@@ -59,6 +59,7 @@ int page = 0;
 int drawnHomeScreen = 0;
 int currentPosition = 0;
 int frequency = 1; //in Hz
+int cycleTime = 10; //in seconds
 int time = 0;
 
 int buttonSpacing = 30;
@@ -137,7 +138,7 @@ void setup() {
 boolean updateReady = false;
 
 void loop() {
-  //returnTFTpins();
+
   // a point object holds x y and z coordinates
   //TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
   TSPoint p = ts.getPoint();
@@ -157,13 +158,30 @@ void loop() {
     //Serial.print("\tPressure = "); Serial.println(p.z);
     Serial.println(".");
 
-
+    //Plus button touch settings top
     if (p.x > 170 & p.x < 220 & p.y > 180 & p.y < 200) {
       Serial.println("Top + button activated");
       frequency = frequency + 1;
       updateReady = true;
     }
 
+    //Minus button touch settings top
+    if (p.x > 5 & p.x < 75 & p.y > 169 & p.y < 220) {
+      Serial.println("Top - button activated");
+      //cant have less that 1 frequency
+      if (frequency > 1) {
+        frequency = frequency - 1;
+      }
+      else {
+        Serial.println("Can't have a frequency less that one");
+      }
+      updateReady = true;
+    }
+
+
+
+
+    //Go Button
     if (p.x > 130 & p.x < 230 & p.y > 40 & p.y < 60) {
       Serial.println("Go activated");
       runCycle(frequency);
@@ -171,29 +189,12 @@ void loop() {
       delay(500);
 
     }
-    returnTFTpins();
+    returnTFTpins(); //Fixes updating issue with shared touch and TFT pin
   }
 
 
-
-  if (updateReady == true) {
-    //Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
-    //tft.fillScreen(BLACK);
-    tft.setTextColor(WHITE);
-    tft.setTextSize(3);
-    if (frequency < 10) {
-      tft.setCursor((tft.width() / 2) - 10, 110 );
-    }
-    else {
-      tft.setCursor((tft.width() / 2) - 20, 110);
-    }
-    tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
-    tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
-    tft.println(frequency);
-    Serial.println(frequency);
-    delay(50);
-    updateReady = false;
-  }
+  //Start of screen updating
+  updateScreen();
 
 }
 
@@ -211,7 +212,7 @@ void drawHomeScreen() {
 
   tft.setTextColor(WHITE);
   tft.setCursor(10, position1 - buttonSpacing + 10);
-
+  tft.println("Frequency (Hz)");
   //defining box
   tft.drawRect(10, position1, tft.width() - 20, sectionHeight, RED);
   tft.fillRect(10, position1, tft.width() - 20, sectionHeight, BLUE);
@@ -223,7 +224,7 @@ void drawHomeScreen() {
   tft.fillRect(tft.width() - 70, position1, 60, sectionHeight, GREEN);
 
   tft.setCursor(10, position2 - buttonSpacing + 10);
-  tft.println("Cycle Time");
+  tft.println("Cycle Time (s)");
 
   //defining box
   tft.drawRect(10, position2, tft.width() - 20, sectionHeight, BLUE);
@@ -341,9 +342,25 @@ void returnTFTpins() {
 }
 
 
-
-
-
+void updateScreen() {
+  if (updateReady == true) {
+    tft.setTextColor(WHITE);
+    tft.setTextSize(3);
+    if (frequency < 10) {
+      tft.setCursor((tft.width() / 2) - 10, 110 );
+    }
+    else {
+      tft.setCursor((tft.width() / 2) - 20, 110);
+    }
+    tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
+    tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
+    tft.println(frequency);
+    Serial.println(frequency);
+    //Slows down update
+    delay(50);
+    updateReady = false;
+  }
+}
 
 
 
