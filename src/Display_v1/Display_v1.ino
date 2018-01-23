@@ -180,13 +180,13 @@ void loop() {
     //Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);     
     //tft.fillScreen(BLACK);
     tft.setTextColor(WHITE);
-    tft.setTextSize(2);
-    tft.setCursor((tft.width()/2)-10, 120);
-    tft.drawRect(tft.width()/2-10, 120-5, 20, 20 ,BLUE);
-    tft.fillRect(tft.width()/2-10, 120-5, 20, 20 ,BLUE);
+    tft.setTextSize(3);
+    tft.setCursor((tft.width()/2)-20, 110);
+    tft.drawRect(tft.width()/2-20, 110-5, 30, 20 ,BLUE);
+    tft.fillRect(tft.width()/2-20, 110-5, 30, 20 ,BLUE);
     tft.println(frequency);
     Serial.println(frequency);
-    delay(100);
+    delay(50);
     updateReady = false;
   }
 
