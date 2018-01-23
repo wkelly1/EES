@@ -177,13 +177,18 @@ void loop() {
 
 
   if (updateReady == true) {
-    //Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);     
+    //Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
     //tft.fillScreen(BLACK);
     tft.setTextColor(WHITE);
     tft.setTextSize(3);
-    tft.setCursor((tft.width()/2)-20, 110);
-    tft.drawRect(tft.width()/2-50, 110-5, 60, 40 ,RED);
-    tft.fillRect(tft.width()/2-20, 110-5, 30, 40 ,RED);
+    if (frequency < 10) {
+      tft.setCursor((tft.width() / 2) - 10, 110 );
+    }
+    else {
+      tft.setCursor((tft.width() / 2) - 20, 110);
+    }
+    tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
+    tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
     tft.println(frequency);
     Serial.println(frequency);
     delay(50);
@@ -206,7 +211,7 @@ void drawHomeScreen() {
 
   tft.setTextColor(WHITE);
   tft.setCursor(10, position1 - buttonSpacing + 10);
-  tft.println("Frequency");
+
   //defining box
   tft.drawRect(10, position1, tft.width() - 20, sectionHeight, RED);
   tft.fillRect(10, position1, tft.width() - 20, sectionHeight, BLUE);
@@ -238,7 +243,7 @@ void drawHomeScreen() {
   tft.fillRect(tft.width() - 110, position3, 100, sectionHeight, GREEN);
 
   tft.setTextSize(3);
-  tft.setCursor((tft.width() / 2) - 10,110 );
+  tft.setCursor((tft.width() / 2) - 10, 110 );
   tft.println(frequency);
 
 
