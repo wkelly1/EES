@@ -1,3 +1,8 @@
+#include <Adafruit_GFX.h>
+#include <Adafruit_SPITFT.h>
+#include <Adafruit_SPITFT_Macros.h>
+#include <gfxfont.h>
+
 // Touch screen library with X Y and Z (pressure) readings as well
 // as oversampling to avoid 'bouncing'
 // This demo code returns raw readings, public domain
@@ -5,8 +10,9 @@
 //including library
 #include <stdint.h>
 #include "TouchScreen.h"
-#include <Elegoo_GFX.h>
+//#include <Elegoo_GFX.h>
 #include <Elegoo_TFTLCD.h>
+
 
 
 // These are the pins for the shield!
@@ -164,7 +170,9 @@ void loop() {
     if (p.x > 170 & p.x < 220 & p.y > 180 & p.y < 200) {
       Serial.println("Top + button activated");
       frequency = frequency + 1;
-     // frequencyUpdate = true;
+
+      // frequencyUpdate = true;
+
       updateReady = true;
     }
 
@@ -175,12 +183,46 @@ void loop() {
       if (frequency > 1) {
         frequency = frequency - 1;
         //frequencyUpdate = true;
-         updateReady = true;
+
+        updateReady = true;
+
       }
       else {
         Serial.println("Can't have a frequency less that one");
       }
-     
+
+
+    }
+
+    //Plus button touch settings bottom (cycle time increase)
+    if (p.x > 170 & p.x < 230 & p.y > 100 & p.y < 160) {
+      Serial.println("Bottom + button activated");
+      //cant have less than 1 cycle time
+      if (cycleTime > 1) {
+        cycleTime = cycleTime + 1;
+        // cycleTimeUpdate = true;
+        updateReady = true;
+      }
+      else {
+        Serial.println("Can't have a cycle time less that one");
+      }
+
+    }
+
+
+    //Minus button touch settings bottom (cycle time increase)
+    if (p.x > 15 & p.x < 80 & p.y > 80 & p.y < 163) {
+      Serial.println("Bottom - button activated");
+      //cant have less than 1 cycle time
+      if (cycleTime > 1) {
+        cycleTime = cycleTime - 1;
+        updateReady = true;
+      }
+      else {
+        Serial.println("Can't have a cycle time less that one");
+      }
+
+
     }
 
     //Plus button touch settings bottom (cycle time increase)
@@ -202,8 +244,10 @@ void loop() {
     //Go Button
     if (p.x > 130 & p.x < 230 & p.y > 40 & p.y < 60) {
       Serial.println("Go activated");
-      runCycle(frequency);
-      delay(500);
+
+      runCycle(frequency, cycleTime);
+
+
 
     }
     returnTFTpins(); //Fixes updating issue with shared touch and TFT pin
@@ -216,7 +260,7 @@ void loop() {
 }
 
 void drawHomeScreen() {
-
+  tft.setFont(FreeMono9pt7b);
   tft.fillScreen(BLACK);
   tft.setTextColor(RED);
   tft.setTextSize(2);
@@ -292,54 +336,65 @@ void drawHomeScreen() {
   tft.println("GO");
 }
 
-void runCycle(int frequency) {
-  int startTime = 0;
+void runCycle(int frequency, int cycleTime) {
+  unsigned long startTime = 0;
   int endTime = 0;
   int currentTime = 0;
   unsigned long measureStartTime = 0;
   unsigned long measureEndTime = 0;
   int emergancyStop = 0;
   startTime = millis();
-  endTime = startTime + 5000;
-  Serial.print("Running Cycle");
-  while (currentTime < endTime || emergancyStop == 1 ) {
+  endTime = startTime + (cycleTime * 1000);
+  Serial.println("Running Cycle");
+  Serial.println("Frequency of cycle = ");
+  Serial.println(frequency);
+  Serial.println("Cycle time of cycle = ");
+  Serial.println(cycleTime);
 
-    measureStartTime = millis();
-
+  while (currentTime < endTime && emergancyStop == 0 ) {
     //Get touch screen point
     digitalWrite(13, HIGH);
     TSPoint p = ts.getPoint();
+    Serial.println(p.x);
     digitalWrite(13, LOW);
 
-    if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
-      p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
-      p.y = (tft.height() - map(p.y, TS_MINY, TS_MAXY, tft.height(), 0));
+    if (p.z > MINPRESSURE && p.z < MAXPRESSURE || emergancyStop == 0) {
 
+      p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
+      p.y = map(p.y, TS_MINY, TS_MAXY, tft.height(), 0);
+      Serial.println("Looped");
+      // measureStartTime = millis();
       digitalWrite(relay1, HIGH);
       digitalWrite(relay2, LOW);
       digitalWrite(relay3, HIGH);
       digitalWrite(relay4, LOW);
       //1hz or 1 cycle a second requires 0.5 second of delay after each switch
-      delay((frequency * 1000)/2);
+
+      delay(500 / (frequency));
       digitalWrite(relay1, LOW);
       digitalWrite(relay2, HIGH);
       digitalWrite(relay3, LOW);
-      digitalWrite(relay4, HIGH);    
-      delay((frequency * 1000)/2);
-      measureEndTime = millis();
-      Serial.println(measureEndTime - measureStartTime);
+      digitalWrite(relay4, HIGH);
+      delay(500 / (frequency));
+
 
       if (p.x > 6 & p.x < 105 & p.y > 25 & p.y < 75) {
         emergancyStop = 1;
+        returnTFTpins();
         Serial.println("Emergancy Stop Activated");
         tft.setTextColor(RED);
+        tft.setCursor(5, 150);
+        tft.fillRect(0, 150 - 20, tft.width(), 100, WHITE);
         tft.println("Emergancy Stop Activated");
+        delay(3000);
+        drawHomeScreen();
 
       }
     }
     currentTime = millis();
 
   }
+  Serial.println("Completed cycle");
 }
 
 void returnTFTpins() {
@@ -361,41 +416,45 @@ void updateScreen(boolean frequencyUpdate, boolean cycleTimeUpdate) {
     tft.setTextColor(WHITE);
     tft.setTextSize(3);
     //if (frequencyUpdate == true) {
-      //Frequency update
-      if (frequency < 10) {
-        tft.setCursor((tft.width() / 2) - 10, 110 );
-      }
-      else {
-        tft.setCursor((tft.width() / 2) - 20, 110);
-      }
-      tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
-      tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
-      tft.println(frequency);
-      Serial.println(frequency);
-      
-      //Slows down update
-      delay(50);
+
+    //Frequency update
+    if (frequency < 10) {
+      tft.setCursor((tft.width() / 2) - 10, 110 );
+    }
+    else {
+      tft.setCursor((tft.width() / 2) - 20, 110);
+    }
+    tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
+    tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
+    tft.println(frequency);
+    Serial.println(frequency);
+
+    //Slows down update
+    delay(50);
+
     //}
     //frequencyUpdate = false;
     //Cycle time update
     //if (cycleTimeUpdate == true) {
 
 
-      if (cycleTime < 10) {
-        tft.setCursor((tft.width() / 2) - 10, 185 );
-      }
-      else {
-        tft.setCursor((tft.width() / 2) - 20, 185);
-      }
-      tft.drawRect(tft.width() / 2 - 40, position2 + 10, 80, 30 , BLUE);
-      tft.fillRect(tft.width() / 2 - 40, position2 + 10, 80, 30 , BLUE);
-      tft.println(cycleTime);
-      Serial.println(cycleTime);
 
-      //Slows down update
-      delay(50);
+    if (cycleTime < 10) {
+      tft.setCursor((tft.width() / 2) - 10, 185 );
+    }
+    else {
+      tft.setCursor((tft.width() / 2) - 20, 185);
+    }
+    tft.drawRect(tft.width() / 2 - 40, position2 + 10, 80, 30 , BLUE);
+    tft.fillRect(tft.width() / 2 - 40, position2 + 10, 80, 30 , BLUE);
+    tft.println(cycleTime);
+    Serial.println(cycleTime);
+
+    //Slows down update
+    delay(50);
     //}
-         // cycleTimeUpdate = false;
+    // cycleTimeUpdate = false;
+
   }
   updateReady = false;
 }
