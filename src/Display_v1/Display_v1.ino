@@ -1,13 +1,13 @@
-#include <Adafruit_GFX.h>
-#include <Adafruit_SPITFT.h>
-#include <Adafruit_SPITFT_Macros.h>
-#include <gfxfont.h>
 
 // Touch screen library with X Y and Z (pressure) readings as well
 // as oversampling to avoid 'bouncing'
 // This demo code returns raw readings, public domain
 
 //including library
+#include <Adafruit_GFX.h>
+#include <Adafruit_SPITFT.h>
+#include <Adafruit_SPITFT_Macros.h>
+#include <gfxfont.h>
 #include <stdint.h>
 #include "TouchScreen.h"
 //#include <Elegoo_GFX.h>
@@ -239,7 +239,7 @@ void loop() {
 }
 
 void drawHomeScreen() {
-  tft.setFont(FreeMono9pt7b);
+
   tft.fillScreen(BLACK);
   tft.setTextColor(RED);
   tft.setTextSize(2);
@@ -257,7 +257,7 @@ void drawHomeScreen() {
   tft.drawRect(10, position1, tft.width() - 20, sectionHeight, RED);
   tft.fillRect(10, position1, tft.width() - 20, sectionHeight, BLUE);
 
-  //Buttons top
+  //Buttons to
   tft.drawRect(10, position1, 60, sectionHeight, GREEN);//Green inner box left
   tft.fillRect(10, position1, 60, sectionHeight, GREEN);//Green inner box left
   tft.drawRect(tft.width() - 70, position1, 60, sectionHeight, GREEN);
