@@ -170,7 +170,9 @@ void loop() {
     if (p.x > 170 & p.x < 220 & p.y > 180 & p.y < 200) {
       Serial.println("Top + button activated");
       frequency = frequency + 1;
+
       // frequencyUpdate = true;
+
       updateReady = true;
     }
 
@@ -181,11 +183,14 @@ void loop() {
       if (frequency > 1) {
         frequency = frequency - 1;
         //frequencyUpdate = true;
+
         updateReady = true;
+
       }
       else {
         Serial.println("Can't have a frequency less that one");
       }
+
 
     }
 
@@ -217,15 +222,31 @@ void loop() {
         Serial.println("Can't have a cycle time less that one");
       }
 
+
     }
 
-
+    //Plus button touch settings bottom (cycle time increase)
+    if (p.x > 170 & p.x < 230 & p.y > 100 & p.y < 160) {
+      Serial.println("Bottom + button activated");
+      //cant have less than 1 cycle time
+      if (cycleTime > 1) {
+        cycleTime = cycleTime + 1;
+       // cycleTimeUpdate = true;
+        updateReady = true;
+      }
+      else {
+        Serial.println("Can't have a cycle time less that one");
+      }
+      
+    }
 
 
     //Go Button
     if (p.x > 130 & p.x < 230 & p.y > 40 & p.y < 60) {
       Serial.println("Go activated");
+
       runCycle(frequency, cycleTime);
+
 
 
     }
@@ -348,12 +369,14 @@ void runCycle(int frequency, int cycleTime) {
       digitalWrite(relay3, HIGH);
       digitalWrite(relay4, LOW);
       //1hz or 1 cycle a second requires 0.5 second of delay after each switch
+
       delay(500 / (frequency));
       digitalWrite(relay1, LOW);
       digitalWrite(relay2, HIGH);
       digitalWrite(relay3, LOW);
       digitalWrite(relay4, HIGH);
       delay(500 / (frequency));
+
 
       if (p.x > 6 & p.x < 105 & p.y > 25 & p.y < 75) {
         emergancyStop = 1;
@@ -393,6 +416,7 @@ void updateScreen(boolean frequencyUpdate, boolean cycleTimeUpdate) {
     tft.setTextColor(WHITE);
     tft.setTextSize(3);
     //if (frequencyUpdate == true) {
+
     //Frequency update
     if (frequency < 10) {
       tft.setCursor((tft.width() / 2) - 10, 110 );
@@ -407,10 +431,12 @@ void updateScreen(boolean frequencyUpdate, boolean cycleTimeUpdate) {
 
     //Slows down update
     delay(50);
+
     //}
     //frequencyUpdate = false;
     //Cycle time update
     //if (cycleTimeUpdate == true) {
+
 
 
     if (cycleTime < 10) {
@@ -428,6 +454,7 @@ void updateScreen(boolean frequencyUpdate, boolean cycleTimeUpdate) {
     delay(50);
     //}
     // cycleTimeUpdate = false;
+
   }
   updateReady = false;
 }
