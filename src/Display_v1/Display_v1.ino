@@ -66,7 +66,7 @@ Elegoo_TFTLCD tft(LCD_CS, LCD_CD, LCD_WR, LCD_RD, LCD_RESET);
 int page = 0;
 int drawnHomeScreen = 0;
 int currentPosition = 0;
-int frequency = 1; //in Hz
+float frequency = 1; //in Hz
 int cycleTime = 10; //in seconds
 int time = 0;
 
@@ -169,9 +169,9 @@ void loop() {
     Serial.println(".");
 
     //Plus button touch settings top
-    if (p.x > 170 & p.x < 220 & p.y > 180 & p.y < 200) {
+    if (p.x > 170 & p.x < 220 & p.y > 170 & p.y < 230) {
       Serial.println("Top + button activated");
-      frequency = frequency + 1;
+      frequency = frequency + 0.2;
       // frequencyUpdate = true;
       updateReady = true;
     }
@@ -180,13 +180,13 @@ void loop() {
     if (p.x > 5 & p.x < 75 & p.y > 169 & p.y < 220) {
       Serial.println("Top - button activated");
       //cant have less that 1 frequency
-      if (frequency > 1) {
-        frequency = frequency - 1;
+      if (frequency > 0.2) {
+        frequency = frequency - 0.2;
         //frequencyUpdate = true;
         updateReady = true;
       }
       else {
-        Serial.println("Can't have a frequency less that one");
+        Serial.println("Can't have a frequency less that 0");
       }
 
     }
@@ -283,7 +283,7 @@ void drawHomeScreen() {
   tft.fillRect(tft.width() - 110, position3, 100, sectionHeight, GREEN);
 
   tft.setTextSize(3);
-  tft.setCursor((tft.width() / 2) - 10, 110 );
+  tft.setCursor((tft.width() / 2) - 30, 110 );
   tft.println(frequency);
 
   tft.setCursor((tft.width() / 2) - 20, 185);
@@ -314,7 +314,7 @@ void drawHomeScreen() {
   tft.println("GO");
 }
 
-void runCycle(int frequency, int cycleTime) {
+void runCycle(float frequency, int cycleTime) {
   unsigned long startTime = 0;
   unsigned long endTime = 0;
   unsigned long currentTime = 0;
@@ -375,12 +375,12 @@ void runCycle(int frequency, int cycleTime) {
         Serial.println("Emergancy Stop Activated");
         tft.setTextColor(RED);
         tft.setTextSize(2);
-        tft.setCursor(40, 150);
+        tft.setCursor(60, 150);
         tft.fillRect(0, 150 - 20, tft.width(), 100, WHITE);
         tft.println("Emergancy");
-        tft.setCursor(70,170);
+        tft.setCursor(90,170);
         tft.println("Stop");
-        tft.setCursor(40,190);
+        tft.setCursor(60,190);
         tft.println("Activated");
         delay(3000);
         
@@ -415,10 +415,10 @@ void updateScreen(boolean frequencyUpdate, boolean cycleTimeUpdate) {
     tft.setTextSize(3);
 
     if (frequency < 10) {
-      tft.setCursor((tft.width() / 2) - 10, 110 );
+      tft.setCursor((tft.width() / 2) - 30, 110 );
     }
     else {
-      tft.setCursor((tft.width() / 2) - 20, 110);
+      tft.setCursor((tft.width() / 2) - 30, 110);
     }
     tft.drawRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
     tft.fillRect(tft.width() / 2 - 40, position1 + 10, 80, 30 , BLUE);
