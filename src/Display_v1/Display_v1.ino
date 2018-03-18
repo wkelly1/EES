@@ -4,6 +4,7 @@
 // This demo code returns raw readings, public domain
 
 //including library
+
 #include <Adafruit_GFX.h>
 #include <Adafruit_SPITFT.h>
 #include <Adafruit_SPITFT_Macros.h>
@@ -194,14 +195,11 @@ void loop() {
     if (p.x > 170 & p.x < 230 & p.y > 100 & p.y < 160) {
       Serial.println("Bottom + button activated");
       //cant have less than 1 cycle time
-      if (cycleTime > 1) {
-        cycleTime = cycleTime + 1;
-        // cycleTimeUpdate = true;
-        updateReady = true;
-      }
-      else {
-        Serial.println("Can't have a cycle time less that one");
-      }
+
+      cycleTime = cycleTime + 1;
+      // cycleTimeUpdate = true;
+      updateReady = true;
+
 
     }
 
@@ -318,10 +316,8 @@ void drawHomeScreen() {
 
 void runCycle(int frequency, int cycleTime) {
   unsigned long startTime = 0;
-  int endTime = 0;
-  int currentTime = 0;
-  unsigned long measureStartTime = 0;
-  unsigned long measureEndTime = 0;
+  unsigned long endTime = 0;
+  unsigned long currentTime = 0;
   int emergancyStop = 0;
   startTime = millis();
   endTime = startTime + (cycleTime * 1000);
@@ -330,8 +326,26 @@ void runCycle(int frequency, int cycleTime) {
   Serial.println(frequency);
   Serial.println("Cycle time of cycle = ");
   Serial.println(cycleTime);
+  returnTFTpins();
+  tft.fillRect(0,0,tft.width(),tft.height(),BLACK);
+  tft.fillRect(30,30,tft.width()-60,tft.height()-60,RED);
+  tft.setCursor((tft.width()/2)-50,(tft.height()/2)-20);
+  tft.setTextSize(5);
+  tft.println("STOP");
+  tft.setCursor(20,10);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(2);
+  tft.println("Press and hold");
+  
+    digitalWrite(13, HIGH);
+    TSPoint p = ts.getPoint();
+    Serial.println(p.x);
+    digitalWrite(13, LOW);
+
+
 
   while (currentTime < endTime && emergancyStop == 0 ) {
+
     //Get touch screen point
     digitalWrite(13, HIGH);
     TSPoint p = ts.getPoint();
@@ -342,8 +356,7 @@ void runCycle(int frequency, int cycleTime) {
 
       p.x = map(p.x, TS_MINX, TS_MAXX, tft.width(), 0);
       p.y = map(p.y, TS_MINY, TS_MAXY, tft.height(), 0);
-      Serial.println("Looped");
-      // measureStartTime = millis();
+
       digitalWrite(relay1, HIGH);
       digitalWrite(relay2, LOW);
       digitalWrite(relay3, HIGH);
@@ -356,17 +369,21 @@ void runCycle(int frequency, int cycleTime) {
       digitalWrite(relay4, HIGH);
       delay(500 / (frequency));
 
-      if (p.x > 6 & p.x < 105 & p.y > 25 & p.y < 75) {
+      if (p.x > 10 & p.x < 240 & p.y > 10 & p.y < 300) {
         emergancyStop = 1;
         returnTFTpins();
         Serial.println("Emergancy Stop Activated");
         tft.setTextColor(RED);
-        tft.setCursor(20, 150);
+        tft.setTextSize(2);
+        tft.setCursor(40, 150);
         tft.fillRect(0, 150 - 20, tft.width(), 100, WHITE);
-        tft.println("Emergancy Stop");
+        tft.println("Emergancy");
+        tft.setCursor(70,170);
+        tft.println("Stop");
+        tft.setCursor(40,190);
         tft.println("Activated");
         delay(3000);
-        drawHomeScreen();
+        
 
       }
     }
@@ -374,6 +391,8 @@ void runCycle(int frequency, int cycleTime) {
 
   }
   Serial.println("Completed cycle");
+  returnTFTpins();
+  drawHomeScreen();
 }
 
 void returnTFTpins() {
