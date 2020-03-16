@@ -445,19 +445,3 @@ void updateScreen(boolean frequencyUpdate, boolean cycleTimeUpdate) {
   }
   updateReady = false;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
